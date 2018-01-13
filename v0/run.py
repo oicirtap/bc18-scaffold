@@ -1,7 +1,5 @@
 import battlecode as bc
-import random
-import sys
-import traceback
+import random, time, sys, traceback
 
 from unit_util import *
 
@@ -58,6 +56,8 @@ for unit in map.initial_units:
 #==============================================================================#
 while True:
     print('ROUND:', gc.round())
+    start_time = time.clock()
+
     try:
         for unit in gc.my_units():
             if unit.id not in unit_states:
@@ -71,3 +71,6 @@ while True:
 
     # Send the actions we've performed, and wait for our next turn.
     gc.next_turn()
+
+    print('======== {:.3f}ms ========'.format((time.clock() - start_time)*1000.0))
+
