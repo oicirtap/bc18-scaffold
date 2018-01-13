@@ -47,6 +47,20 @@ gc.queue_research(bc.UnitType.Knight)
 
 # Unit Setup -----
 
+def new_tally():
+    t = {}
+    t[bc.UnitType.Factory] = 0
+    t[bc.UnitType.Healer] = 0
+    t[bc.UnitType.Knight] = 0
+    t[bc.UnitType.Mage] = 0
+    t[bc.UnitType.Ranger] = 0
+    t[bc.UnitType.Rocket] = 0
+    t[bc.UnitType.Worker] = 0
+    return t
+
+current_tally = new_tally()
+tally = new_tally()
+
 unit_states = {}
 
 for unit in map.initial_units:
@@ -58,8 +72,12 @@ for unit in map.initial_units:
 #==============================================================================#
 while True:
     print('ROUND:', gc.round())
+    tally = current_tally
+    current_tally = new_tally()
     try:
         for unit in gc.my_units():
+            # update tally
+            current_tally[unit.unit_type] = current_tally[unit.unit_type] + 1
             if unit.id not in unit_states:
                 unit_states[unit.id] = get_unit_state(unit)
             unit_turn(gc, unit, unit_states[unit.id])
