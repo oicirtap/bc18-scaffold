@@ -1,7 +1,5 @@
 import battlecode as bc
-import random
-import sys
-import traceback
+import random, time, sys, traceback
 
 from unit_util import *
 
@@ -72,8 +70,10 @@ for unit in map.initial_units:
 #==============================================================================#
 while True:
     print('ROUND:', gc.round())
+    start_time = time.clock()
     tally = current_tally
     current_tally = new_tally()
+
     try:
         for unit in gc.my_units():
             # update tally
@@ -89,3 +89,6 @@ while True:
 
     # Send the actions we've performed, and wait for our next turn.
     gc.next_turn()
+
+    print('======== {:.3f}ms ========'.format((time.clock() - start_time)*1000.0))
+
