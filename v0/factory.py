@@ -14,9 +14,7 @@ class UnitState:
         self.state = State.Initial
 
 def unit_turn(gc, unit, state):
-    print(unit.unit_type)
     garrison = unit.structure_garrison()
-    print(garrison)
     if len(garrison) > 0:
         d = random.choice(directions)
         if gc.can_unload(unit.id, d):
