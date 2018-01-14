@@ -65,6 +65,16 @@ gc.queue_research(bc.UnitType.Knight)
 prev_tally = None
 current_tally = None
 
+unit_cap = {
+    bc.UnitType.Factory : 10,
+    bc.UnitType.Healer : 0,
+    bc.UnitType.Knight : 100,
+    bc.UnitType.Mage : 0,
+    bc.UnitType.Ranger : 50,
+    bc.UnitType.Rocket : 2,
+    bc.UnitType.Worker : 10
+}
+
 unit_states = {}
 
 for unit in map.initial_units:
