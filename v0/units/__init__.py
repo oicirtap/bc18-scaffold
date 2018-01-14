@@ -3,6 +3,7 @@ import battlecode as bc
 import units.Factory as F
 import units.Knight as K
 import units.Worker as W
+import units.Ranger as R
 
 
 def get_unit_state(unit):
@@ -18,7 +19,7 @@ def get_unit_state(unit):
     if unit.unit_type == bc.UnitType.Knight:
         return K.UnitState(unit)
     if unit.unit_type == bc.UnitType.Ranger:
-        pass
+        return R.UnitState(unit)
     if unit.unit_type == bc.UnitType.Mage:
         pass
     if unit.unit_type == bc.UnitType.Healer:
@@ -42,7 +43,7 @@ def run_unit_turn(gc, unit, state):
     if unit.unit_type == bc.UnitType.Knight:
         K.unit_turn(gc, unit, state)
     if unit.unit_type == bc.UnitType.Ranger:
-        pass
+        R.unit_turn(gc, unit, state)
     if unit.unit_type == bc.UnitType.Mage:
         pass
     if unit.unit_type == bc.UnitType.Healer:
