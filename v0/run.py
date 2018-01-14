@@ -50,9 +50,9 @@ gc.queue_research(bc.UnitType.Worker)
 gc.queue_research(bc.UnitType.Rocket)
 gc.queue_research(bc.UnitType.Knight)
 
-# Unit Setup -----
-current_tally = Tally()
-tally = Tally()
+# Unit Setup ----
+prev_tally = None
+current_tally = None
 
 unit_states = {}
 
@@ -70,15 +70,19 @@ while True:
     print('ROUND:', gc.round())
     start_time = time.clock()
 
-    tally = current_tally
+    current_round = gc.round()
+    my_units = gc.my_units()
+
+    prev_tally = current_tally
     current_tally = Tally()
+
     try:
         if gc.planet() == bc.Planet.Earth:
-            if gc.round() < 20:
-                strategies.run_early_build_order(gc)
+            if current_round < 20:
+                for unit in my_units:
+                    pass
             else:
-                for unit in gc.my_units():
-                    # update tally
+                for unit in my_units:
                     current_tally.add(unit.unit_type)
                     if unit.id not in unit_states:
                         unit_states[unit.id] = units.get_unit_state(unit)
@@ -92,5 +96,4 @@ while True:
 
     # Send the actions we've performed, and wait for our next turn.
     gc.next_turn()
-    print('======== {:.3f}ms ========'.format(
-        (time.clock() - start_time) * 1000.0))
+    print('======== {:.3f}ms ========'.format((time.clock() - start_time) * 1000.0))
