@@ -19,6 +19,8 @@ random.seed(6137)
 # Get team.
 my_team = gc.team()
 
+# Direction list
+directions = list(bc.Direction)
 
 #==============================================================================#
 #                                    MAP                                       #
@@ -74,7 +76,67 @@ for unit in map.initial_units:
 #==============================================================================#
 #                          EARLY_GAME_BUILD_ORDER                              #
 #==============================================================================#
+first_worker = None
+first_worker_build_quadrant = None
+first_worker_factory_dir = None
 
+second_worker = None
+second_worker_dir = None
+second_worker_factory_dir = None
+
+third_worker = None
+third_worker_dir = None
+third_worker_factory_dir = None
+
+first_factory_blueprint = None
+
+# TODO: find out better way to pick seed worker (farthest from enemy, most free)
+for unit in map.initial_units:
+    if unit.team == my_team:
+        if gc.can_move(unit.id, bc.Direction.North) and gc.can_move(unit.id, bc.Direction.Northeast) and gc.can_move(unit.id, bc.Direction.East):
+            first_worker = unit
+            first_worker_build_quadrant = 1
+            # Worker dir
+            second_worker_dir = bc.Direction.North
+            third_worker_dir = bc.Direction.East
+            # Factory dir
+            first_worker_factory_dir = bc.Direction.East
+            second_worker_factory_dir = bc.Direction.Southwest
+            third_worker_factory_dir = bc.Direction.South
+            break
+        elif gc.can_move(unit.id, bc.Direction.North) and gc.can_move(unit.id, bc.Direction.Northwest) and gc.can_move(unit.id, bc.Direction.West):
+            first_worker = unit
+            first_worker_build_quadrant = 2
+            # Worker dir
+            second_worker_dir = bc.Direction.North
+            third_worker_dir = bc.Direction.West
+            # Factory dir
+            first_worker_factory_dir = bc.Direction.West
+            second_worker_factory_dir = bc.Direction.Southwest
+            third_worker_factory_dir = bc.Direction.South
+            break
+        elif gc.can_move(unit.id, bc.Direction.South) and gc.can_move(unit.id, bc.Direction.Southwest) and gc.can_move(unit.id, bc.Direction.West):
+            first_worker = unit
+            first_worker_build_quadrant = 3
+            # Worker dir
+            second_worker_dir = bc.Direction.South
+            third_worker_dir = bc.Direction.West
+            # Factory dir
+            first_worker_factory_dir = bc.Direction.West
+            second_worker_factory_dir = bc.Direction.Northwest
+            third_worker_factory_dir = bc.Direction.North
+            break
+        elif gc.can_move(unit.id, bc.Direction.South) and gc.can_move(unit.id, bc.Direction.Southeast) and gc.can_move(unit.id, bc.Direction.East):
+            first_worker = unit
+            first_worker_build_quadrant = 4
+            # Worker dir
+            second_worker_dir = bc.Direction.South
+            third_worker_dir = bc.Direction.East
+            # Factory dir
+            first_worker_factory_dir = bc.Direction.East
+            second_worker_factory_dir = bc.Direction.Northwest
+            third_worker_factory_dir = bc.Direction.North
+            break
 
 #==============================================================================#
 #                                   MAIN LOOP                                  #
@@ -91,22 +153,42 @@ while True:
 
     try:
         if gc.planet() == bc.Planet.Earth:
-            if current_round < 20:
-                for unit in my_units:
+            if current_round <= 20:
+                if current_round == 1:
+                    if first_worker is not None:
+                        gc.replicate(first_worker.id, second_worker_dir)
+                    else:
+                        gc.Error("No First Worker")
+                elif current_round == 2:
+                    second_worker = gc.sense_unit_at_location(first_worker.location.map_location().add(second_worker_dir))
+                    gc.replicate(second_worker.id, third_worker_dir)
+                elif current_round == 3:
+                    third_worker = gc.sense_unit_at_location(second_worker.location.map_location().add(third_worker_dir))
+                elif current_round == 4:
                     pass
+                elif current_round == 5:
+                    gc.blueprint(first_worker.id, bc.UnitType.Factory,first_worker_factory_dir)
+                elif current_round == 6:
+                    first_factory_blueprint = gc.sense_unit_at_location(first_worker.location.map_location().add(first_worker_factory_dir))
+                    gc.build(first_worker.id, first_factory_blueprint.id)
+                    gc.build(second_worker.id, first_factory_blueprint.id)
+                    gc.build(third_worker.id, first_factory_blueprint.id)
+                else:
+                    gc.build(first_worker.id, first_factory_blueprint.id)
+                    gc.build(second_worker.id, first_factory_blueprint.id)
+                    gc.build(third_worker.id, first_factory_blueprint.id)
             else:
                 for unit in my_units:
                     current_tally.add(unit.unit_type)
                     if unit.id not in unit_states:
                         unit_states[unit.id] = units.get_unit_state(unit)
                     units.run_unit_turn(gc, unit, unit_states[unit.id])
-        else: # gc.planet() == bc.Planet.Mars:
-            pass
-
     except Exception as e:
         print('Error:', e)
+        gc.Error("Pause")
         traceback.print_exc()
 
     # Send the actions we've performed, and wait for our next turn.
     gc.next_turn()
-    print('======== {:.3f}ms ========'.format((time.clock() - start_time) * 1000.0))
+    print('======== {:.3f}ms ========'.format(
+        (time.clock() - start_time) * 1000.0))
