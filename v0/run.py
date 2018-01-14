@@ -9,58 +9,71 @@ import strategies
 
 from util import Tally
 
-
+#==============================================================================#
+#                              INITIALIZATION                                  #
+#==============================================================================#
 # A GameController is the main type to talk to the game.
 gc = bc.GameController()
 random.seed(6137)
 
-#==============================================================================#
-#                              INITIALIZATION                                  #
-#               Everything we want to do before the main game loop             #
-#==============================================================================#
-
 # Get team.
 my_team = gc.team()
 
+
+#==============================================================================#
+#                                    MAP                                       #
+#==============================================================================#
 # Get feature map.
 earth_map = gc.starting_map(bc.Planet.Earth)
 mars_map = gc.starting_map(bc.Planet.Mars)
 
 # Set "map" to be the map of the current planet.
-map = earth_map
-if gc.planet() == bc.Planet.Mars:
-    map = mars_map
-
-# Get orbit pattern.
-orbit = gc.orbit_pattern()
+map = earth_map if gc.planet() == bc.Planet.Earth else mars_map
 
 # map processing -----
 
 # TODO: BFS
 #    - Determine map connected components
 #    - Locate narrow map sections, if any
-#    - Determine distance to enemy
+#    - Determine map symmetry type (verticle, horizontal, rotational)
+#    - Determine distance to enemy (symmetrical counter_part)
 
+# TODO: Determine optimal mining spot
 # TODO: Determine optimal landing locations
+
+#==============================================================================#
+#                                   SPACE                                      #
+#==============================================================================#
+# Get orbit pattern.
+orbit = gc.orbit_pattern()
 
 # TODO: Determine optimal rocket launching turns
 
+#==============================================================================#
+#                                  RESEARCH                                    #
+#==============================================================================#
 # TODO: research tree
 gc.queue_research(bc.UnitType.Worker)
 gc.queue_research(bc.UnitType.Rocket)
 gc.queue_research(bc.UnitType.Knight)
 
-# Unit Setup ----
+#==============================================================================#
+#                                UNIT SETUP                                    #
+#==============================================================================#
 prev_tally = None
 current_tally = None
 
 unit_states = {}
 
 for unit in map.initial_units:
-    if unit.unit_type == bc.UnitType.Worker:
+    if unit.team == my_team:
         unit_states[unit.id] = units.get_unit_state(unit)
 
 # TODO: cleanup states of units that were eliminated
+
+#==============================================================================#
+#                          EARLY_GAME_BUILD_ORDER                              #
+#==============================================================================#
 
 
 #==============================================================================#
