@@ -44,20 +44,8 @@ gc.queue_research(bc.UnitType.Rocket)
 gc.queue_research(bc.UnitType.Knight)
 
 # Unit Setup -----
-
-def new_tally():
-    t = {}
-    t[bc.UnitType.Factory] = 0
-    t[bc.UnitType.Healer] = 0
-    t[bc.UnitType.Knight] = 0
-    t[bc.UnitType.Mage] = 0
-    t[bc.UnitType.Ranger] = 0
-    t[bc.UnitType.Rocket] = 0
-    t[bc.UnitType.Worker] = 0
-    return t
-
-current_tally = new_tally()
-tally = new_tally()
+current_tally = Tally()
+tally = Tally()
 
 unit_states = {}
 
@@ -72,12 +60,12 @@ while True:
     print('ROUND:', gc.round())
     start_time = time.clock()
     tally = current_tally
-    current_tally = new_tally()
+    current_tally = Tally()
 
     try:
         for unit in gc.my_units():
             # update tally
-            current_tally[unit.unit_type] = current_tally[unit.unit_type] + 1
+            current_tally.add(unit.unit_type)
             if unit.id not in unit_states:
                 unit_states[unit.id] = get_unit_state(unit)
             unit_turn(gc, unit, unit_states[unit.id])
@@ -88,7 +76,6 @@ while True:
         traceback.print_exc()
 
     # Send the actions we've performed, and wait for our next turn.
-    gc.next_turn()
-
+    gc.next_turn(
     print('======== {:.3f}ms ========'.format((time.clock() - start_time)*1000.0))
 
