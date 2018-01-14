@@ -1,8 +1,8 @@
 import battlecode as bc
 
-import Factory as F
-import Knight as K
-import Worker as W
+import units.Factory as F
+import units.Knight as K
+import units.Worker as W
 
 
 def get_unit_state(unit):
@@ -27,7 +27,7 @@ def get_unit_state(unit):
     return None
 
 
-def unit_turn(gc, unit, state):
+def run_unit_turn(gc, unit, state):
     begin_turn(gc, unit)
 
     # Structure turn.
@@ -60,18 +60,4 @@ def end_turn(gc, unit):
     # Perform any actions that we want all units to perform at the end.
     return
 
-class Tally:
-    def __init__(self):
-        self.tally = dict()
 
-        self.tally[bc.UnitType.Factory] = 0
-        self.tally[bc.UnitType.Rocket] = 0
-
-        self.tally[bc.UnitType.Healer] = 0
-        self.tally[bc.UnitType.Knight] = 0
-        self.tally[bc.UnitType.Mage] = 0
-        self.tally[bc.UnitType.Ranger] = 0
-        self.tally[bc.UnitType.Worker] = 0
-
-    def add(self, unit_type):
-        self.tally[unit_type] += 1
