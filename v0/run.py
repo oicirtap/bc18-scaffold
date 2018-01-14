@@ -148,6 +148,51 @@ for unit in map.initial_units:
             third_worker_factory_dir = bc.Direction.North
             break
 
+EARLY_GAME_ROUND_COUNT = 20
+while gc.round() <= EARLY_GAME_ROUND_COUNT:
+    print('EARLY ROUND:', gc.round())
+    start_time = time.clock()
+
+    current_round = gc.round()
+    my_units = gc.my_units()
+
+    prev_tally = current_tally
+    current_tally = Tally()
+
+    try:
+        if current_round == 1:
+            if first_worker is not None:
+                gc.replicate(first_worker.id, second_worker_dir)
+            else:
+                gc.Error("No First Worker")
+        elif current_round == 2:
+            second_worker = gc.sense_unit_at_location(first_worker.location.map_location().add(second_worker_dir))
+            gc.replicate(second_worker.id, third_worker_dir)
+        elif current_round == 3:
+            third_worker = gc.sense_unit_at_location(second_worker.location.map_location().add(third_worker_dir))
+        elif current_round == 4:
+            pass
+        elif current_round == 5:
+            gc.blueprint(first_worker.id, bc.UnitType.Factory,first_worker_factory_dir)
+        elif current_round == 6:
+            first_factory_blueprint = gc.sense_unit_at_location(first_worker.location.map_location().add(first_worker_factory_dir))
+            gc.build(first_worker.id, first_factory_blueprint.id)
+            gc.build(second_worker.id, first_factory_blueprint.id)
+            gc.build(third_worker.id, first_factory_blueprint.id)
+        else:
+            gc.build(first_worker.id, first_factory_blueprint.id)
+            gc.build(second_worker.id, first_factory_blueprint.id)
+            gc.build(third_worker.id, first_factory_blueprint.id)
+    except Exception as e:
+        print('Error:', e)
+        traceback.print_exc()
+
+    # Send the actions we've performed, and wait for our next turn.
+    gc.next_turn()
+    print('======== {:.3f}ms ========'.format((time.clock() - start_time) * 1000.0))
+
+
+
 #==============================================================================#
 #                                   MAIN LOOP                                  #
 #==============================================================================#
@@ -163,39 +208,13 @@ while True:
 
     try:
         if gc.planet() == bc.Planet.Earth:
-            if current_round <= 20:
-                if current_round == 1:
-                    if first_worker is not None:
-                        gc.replicate(first_worker.id, second_worker_dir)
-                    else:
-                        gc.Error("No First Worker")
-                elif current_round == 2:
-                    second_worker = gc.sense_unit_at_location(first_worker.location.map_location().add(second_worker_dir))
-                    gc.replicate(second_worker.id, third_worker_dir)
-                elif current_round == 3:
-                    third_worker = gc.sense_unit_at_location(second_worker.location.map_location().add(third_worker_dir))
-                elif current_round == 4:
-                    pass
-                elif current_round == 5:
-                    gc.blueprint(first_worker.id, bc.UnitType.Factory,first_worker_factory_dir)
-                elif current_round == 6:
-                    first_factory_blueprint = gc.sense_unit_at_location(first_worker.location.map_location().add(first_worker_factory_dir))
-                    gc.build(first_worker.id, first_factory_blueprint.id)
-                    gc.build(second_worker.id, first_factory_blueprint.id)
-                    gc.build(third_worker.id, first_factory_blueprint.id)
-                else:
-                    gc.build(first_worker.id, first_factory_blueprint.id)
-                    gc.build(second_worker.id, first_factory_blueprint.id)
-                    gc.build(third_worker.id, first_factory_blueprint.id)
-            else:
-                for unit in my_units:
-                    current_tally.add(unit.unit_type)
-                    if unit.id not in unit_states:
-                        unit_states[unit.id] = units.get_unit_state(unit)
-                    units.run_unit_turn(gc, unit, unit_states[unit.id])
+            for unit in my_units:
+                current_tally.add(unit.unit_type)
+                if unit.id not in unit_states:
+                    unit_states[unit.id] = units.get_unit_state(unit)
+                units.run_unit_turn(gc, unit, unit_states[unit.id])
     except Exception as e:
         print('Error:', e)
-        gc.Error("Pause")
         traceback.print_exc()
 
     # Send the actions we've performed, and wait for our next turn.
