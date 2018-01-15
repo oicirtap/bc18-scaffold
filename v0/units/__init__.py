@@ -27,20 +27,20 @@ def get_unit_state(unit):
     return None
 
 
-def run_unit_turn(gc, unit, state):
+def run_unit_turn(gc, unit, state, context):
     begin_turn(gc, unit)
 
     # Structure turn.
     if unit.unit_type == bc.UnitType.Factory:
-        F.unit_turn(gc, unit, state)
+        F.unit_turn(gc, unit, state, context)
     if unit.unit_type == bc.UnitType.Rocket:
         pass
 
-    # Structure turn.
+    # Unit turn.
     if unit.unit_type == bc.UnitType.Worker:
-        W.unit_turn(gc, unit, state)
+        W.unit_turn(gc, unit, state, context)
     if unit.unit_type == bc.UnitType.Knight:
-        K.unit_turn(gc, unit, state)
+        K.unit_turn(gc, unit, state, context)
     if unit.unit_type == bc.UnitType.Ranger:
         pass
     if unit.unit_type == bc.UnitType.Mage:
