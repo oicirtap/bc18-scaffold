@@ -206,13 +206,16 @@ while True:
     prev_tally = current_tally
     current_tally = Tally()
 
+    print('factories: ', prev_tally.tally[bc.UnitType.Factory])
+
     try:
         if gc.planet() == bc.Planet.Earth:
+            # determine if we want to build anything this round.
             for unit in my_units:
                 current_tally.add(unit.unit_type)
                 if unit.id not in unit_states:
                     unit_states[unit.id] = units.get_unit_state(unit)
-                units.run_unit_turn(gc, unit, unit_states[unit.id])
+                units.run_unit_turn(gc, unit, unit_states[unit.id], (prev_tally, unit_cap))
     except Exception as e:
         print('Error:', e)
         traceback.print_exc()
