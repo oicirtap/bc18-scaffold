@@ -1,0 +1,59 @@
+<html>
+<head>
+    <!-- Here's a simple stylesheet to make things look a bit better. -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Viewer2D</h1>
+    <div style="display: none">
+        <label for="fname">If you're hosting the website locally:</label>
+        <input id="fname" placeholder="filepath"/>
+    </div>
+    <div>
+        <label for="ffile">Upload a file:</label>
+        <input id="ffile" type="file"/>
+    </div>
+    <div id="loading"></div>
+    <div>
+        <label for="timeout">Set time delay per turn (ms):</label>
+        <input id="timeout" placeholder="timeout" min="1" type="number"/>
+    </div>
+    <div>
+        <label for="turnslider">Go to turn #:</label>
+        <input id="turnslider" type="range" min="1"/>
+        <button id="pause">Pause</button>
+        <button id="reset">Reset</button>
+    </div>
+    <h2 id="winner"></h2>
+    <div class="viewer">
+        <div class="info">
+            <h3 style="text-align:center;">Turn: #<span id="turn"></span></h3>
+            <h3 style="text-align:center;">Location <span id="location"></span></h3>
+            <table>
+                <tr><td>Karbonite</td><td class="infoRed" id="red_karbonite"></td><td class="infoBlue" id="blue_karbonite"></td></tr>
+                <tr><td>Workers</td><td class="infoRed" id="infoRedWorker"></td><td class="infoBlue" id="infoBlueWorker"></td></tr>
+                <tr><td>Knights</td><td class="infoRed" id="infoRedKnight"></td><td class="infoBlue" id="infoBlueKnight"></td></tr>
+                <tr><td>Rangers</td><td class="infoRed" id="infoRedRanger"></td><td class="infoBlue" id="infoBlueRanger"></td></tr>
+                <tr><td>Mages</td><td class="infoRed" id="infoRedMage"></td><td class="infoBlue" id="infoBlueMage"> </td></tr>
+                <tr><td>Healers</td><td class="infoRed" id="infoRedHealer"></td><td class="infoBlue" id="infoBlueHealer"></td></tr>
+                <tr><td>Factories</td><td class="infoRed" id="infoRedFactory"></td><td class="infoBlue" id="infoBlueFactory"></td></tr>
+                <tr><td>Rockets</td><td class="infoRed" id="infoRedRocket"></td><td class="infoBlue" id="infoBlueRocket"></td></tr>
+            </table>
+            <h3 style="text-align:right;padding-right: 50px">Research <span id="location"></span></h3>
+            <canvas id="research" width=300 height=600"></canvas>
+        </div>
+        <div class="maps">
+            <canvas id="earth" width=500 height=500 style="border: 1px solid #000"></canvas>
+            <canvas id="mars" width=500 height=500 style="border: 1px solid #000"></canvas>
+        </div>
+        <div class="graphs">
+            <canvas id="graphs" width=1006 height=250 style="border: 1px solid #000"></canvas>
+        </div>
+        <div style="color: #CCC; padding-top: 20px; display: inline-block;"><span></span></div>
+    </div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
