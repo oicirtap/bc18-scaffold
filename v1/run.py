@@ -250,7 +250,6 @@ while gc.round() <= EARLY_GAME_ROUND_COUNT:
 while True:
     print('STARTING ROUND:', gc.round())
 
-    previous_time = current_time
     current_round = gc.round()
     my_units = gc.my_units()
 

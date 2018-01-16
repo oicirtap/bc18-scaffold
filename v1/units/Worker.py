@@ -58,7 +58,7 @@ def unit_turn(gc, unit, state, context):
             for d in directions:
                 if gc.can_harvest(unit.id, d):
                     gc.harvest(unit.id, d)
-                    print('Harvested at location ', unit.location.add(d))
+                    print('Harvested at location ', unit.location.map_location().add(d))
                     state.state = State.Harvest
                     state.harvest_direction = d
                     return
@@ -83,7 +83,7 @@ def unit_turn(gc, unit, state, context):
             state.state = State.Idle
             return
         gc.harvest(unit.id, state.harvest_direction)
-        print('Harvested at location ', unit.location.add(state.harvest_direction))
+        print('Harvested at location ', unit.location.map_location().add(state.harvest_direction))
 
 def find_karbonite_within(gc, location, radius_squared):
     locations = gc.all_locations_within(location, radius_squared)
