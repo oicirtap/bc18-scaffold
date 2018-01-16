@@ -59,6 +59,11 @@ def unit_turn(gc, unit, state, context):
                     state.state = State.Harvest
                     state.harvest_direction = d
                     return
+            closest_karbonite = find_karbonite_within(gc, unit.location.map_location(), unit.vision_range)
+            if closest_karbonite is not None:
+                d = unit.location.map_location().direction_to(closest_karbonite)
+                if gc.is_move_ready(unit.id) and gc.can_move(unit.id, d):
+                    gc.move_robot(unit.id, d)
         # Move at random
         d = random.choice(directions)
         if gc.is_move_ready(unit.id) and gc.can_move(unit.id, d):
