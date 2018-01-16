@@ -15,3 +15,4 @@ class Tally:
 
     def add(self, unit_type):
         self.tally[unit_type] += 1
+

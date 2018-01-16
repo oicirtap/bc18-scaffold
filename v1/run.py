@@ -27,7 +27,7 @@ for team in list(bc.Team):
 directions = list(bc.Direction)
 
 # Timing setup
-previous_time_left = None
+previous_time_left = gc.get_time_left_ms()
 current_time_left = gc.get_time_left_ms()
 
 #==============================================================================#
@@ -75,7 +75,7 @@ for y in range(mars_map.height):
 def print_grid(grid):
     print(np.array2string(grid, formatter={'float_kind':'{0:2.0f}'.format}))
 
-
+# Map, grid, and interesting locations
 map = earth_map if gc.planet() == bc.Planet.Earth else mars_map
 grid = earth_grid if gc.planet() == bc.Planet.Earth else mars_grid
 mining_locations = earth_mining_locations if gc.planet() == bc.Planet.Earth else mars_mining_locations
@@ -108,8 +108,10 @@ orbit = gc.orbit_pattern()
 #==============================================================================#
 # TODO: research tree
 gc.queue_research(bc.UnitType.Worker)
-gc.queue_research(bc.UnitType.Rocket)
-gc.queue_research(bc.UnitType.Knight)
+gc.queue_research(bc.UnitType.Ranger)
+gc.queue_research(bc.UnitType.Ranger)
+gc.queue_research(bc.UnitType.Ranger)
+
 
 #==============================================================================#
 #                                UNIT SETUP                                    #
@@ -124,7 +126,7 @@ unit_cap = {
     bc.UnitType.Mage : 0,
     bc.UnitType.Ranger : 50,
     bc.UnitType.Rocket : 2,
-    bc.UnitType.Worker : 10
+    bc.UnitType.Worker : 6
 }
 
 unit_states = {}
@@ -202,6 +204,7 @@ for unit in map.initial_units:
 
 #TODO: recheck this code block to make sure nothing breaks and generalize acrosses map
 EARLY_GAME_ROUND_COUNT = 20
+print("STARTING EARLY GAME")
 while gc.round() <= EARLY_GAME_ROUND_COUNT:
     print('EARLY ROUND:', gc.round())
 
@@ -242,7 +245,9 @@ while gc.round() <= EARLY_GAME_ROUND_COUNT:
 
     # Send the actions we've performed, and wait for our next turn.
     gc.next_turn()
-
+current_time_left = gc.get_time_left_ms()
+print('ENDING EARLY GAME: {:d}ms elapsed, {:d}ms left'.format(current_time_left - previous_time_left, current_time_left))
+print("*"*50)
 
 #==============================================================================#
 #                                   MAIN LOOP                                  #
@@ -250,36 +255,32 @@ while gc.round() <= EARLY_GAME_ROUND_COUNT:
 while True:
     print('STARTING ROUND:', gc.round())
 
-    previous_time = current_time
+    previous_time_left = current_time_left
     current_round = gc.round()
     my_units = gc.my_units()
 
     prev_tally = current_tally
     current_tally = Tally()
 
-    print('factories: ', prev_tally.tally[bc.UnitType.Factory])
-
     try:
         if gc.planet() == bc.Planet.Earth:
             # determine if we want to build anything this round.
             for unit in my_units:
+                # Don't bother with unit not on map or in garrison
+                if not unit.location.is_on_map():
+                    continue
+
                 current_tally.add(unit.unit_type)
                 if unit.id not in unit_states:
                     unit_states[unit.id] = units.get_unit_state(unit)
 
                 # Commanding: setting unit state
-                if unit.unit_type == bc.UnitType.Ranger and unit.location.is_on_map():
-                    if unit_states[unit.id].loc is None:
-                        unit_states[unit.id].loc = unit.location.map_location()
+                if unit.unit_type == bc.UnitType.Ranger:
                     if unit_states[unit.id].grid is None:
-                        #TODO: update grid
                         unit_states[unit.id].set_grid(grid)
-                    if unit_states[unit.id].waypoint is None and len(gc.sense_nearby_units_by_team(unit.location.map_location(), 70, enemy_team)) == 0:
-                        # TODO: pick closest target
+                    if unit_states[unit.id].state == units.Ranger.State.Initial:
                         random.shuffle(attack_locations)
-                        for loc in attack_locations:
-                            if loc.distance_squared_to(unit.location.map_location()) > 50:
-                                unit_states[unit.id].set_waypoint(loc)
+                        unit_states[unit.id].set_waypoint(attack_locations[0])
 
                 units.run_unit_turn(gc, unit, unit_states[unit.id], (prev_tally, unit_cap))
     except Exception as e:
@@ -289,5 +290,7 @@ while True:
 
     # Send the actions we've performed, and wait for our next turn.
     gc.next_turn()
-    print('ENDING ROUND:', gc.round())
+    current_time_left = gc.get_time_left_ms()
+    print('ENDING ROUND: {:d}ms elapsed, {:d}ms left'.format(current_time_left - previous_time_left, current_time_left))
+    print("*"*50)
 

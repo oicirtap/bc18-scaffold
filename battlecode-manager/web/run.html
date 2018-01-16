@@ -346,7 +346,7 @@
     eel.expose(trigger_end_game);
     function trigger_end_game(winner) {
         document.getElementById('runner_view').style.display = "block";
-        document.getElementById('running_view').style.display = "none";
+        // document.getElementById('running_view').style.display = "none";
 
         clearInterval(interval);
         eel.end_game();

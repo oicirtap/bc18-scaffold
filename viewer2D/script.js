@@ -18,7 +18,7 @@ var graph_ctx = graph_canvas.getContext('2d');
 var earth_ctx = earth_canvas.getContext('2d');
 var mars_canvas = document.getElementById('mars');
 var mars_ctx = mars_canvas.getContext('2d');
-var timeout = 100;
+var timeout = 35;
 var activeID = 0;
 
 var classIcons = {};

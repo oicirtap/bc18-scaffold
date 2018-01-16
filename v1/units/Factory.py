@@ -19,7 +19,5 @@ def unit_turn(gc, unit, state, context):
         for d in directions:
             if gc.can_unload(unit.id, d):
                 gc.unload(unit.id, d)
-                print('Unloaded a unit!')
     elif gc.can_produce_robot(unit.id, bc.UnitType.Ranger):
         gc.produce_robot(unit.id, bc.UnitType.Ranger)
-        print('Producing a ranger...')

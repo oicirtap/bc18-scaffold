@@ -24,9 +24,6 @@ class UnitState:
 
 def unit_turn(gc, unit, state, context):
     location = unit.location
-    if not location.is_on_map():
-        return
-
     if state.state == State.Idle:
         nearby = gc.sense_nearby_units(location.map_location(), 2)
         for other in nearby:
