@@ -92,7 +92,7 @@ def fuzzy_a_star(grid, start, goal):
             return reconstruct_path(came_from, start, goal)
 
         for next in grid.neighbors(current):
-            if random.random() > 0.75:
+            if random.random() > 0.8:
                 new_cost = cost_so_far[current] + 1 + np.random.normal(1, 0.1, 1)[0]
             else:
                 new_cost = cost_so_far[current] + 1

@@ -122,11 +122,11 @@ current_tally = None
 unit_cap = {
     bc.UnitType.Factory : 10,
     bc.UnitType.Healer : 0,
-    bc.UnitType.Knight : 100,
+    bc.UnitType.Knight : 50,
     bc.UnitType.Mage : 0,
-    bc.UnitType.Ranger : 50,
+    bc.UnitType.Ranger : 75,
     bc.UnitType.Rocket : 2,
-    bc.UnitType.Worker : 6
+    bc.UnitType.Worker : 15
 }
 
 unit_states = {}
@@ -203,7 +203,7 @@ for unit in map.initial_units:
             break
 
 #TODO: recheck this code block to make sure nothing breaks and generalize acrosses map
-EARLY_GAME_ROUND_COUNT = 20
+EARLY_GAME_ROUND_COUNT = 5
 print("STARTING EARLY GAME")
 while gc.round() <= EARLY_GAME_ROUND_COUNT:
     print('EARLY ROUND:', gc.round())
@@ -230,15 +230,6 @@ while gc.round() <= EARLY_GAME_ROUND_COUNT:
                 pass
             elif current_round == 5:
                 gc.blueprint(first_worker.id, bc.UnitType.Factory,first_worker_factory_dir)
-            elif current_round == 6:
-                first_factory_blueprint = gc.sense_unit_at_location(first_worker.location.map_location().add(first_worker_factory_dir))
-                gc.build(first_worker.id, first_factory_blueprint.id)
-                gc.build(second_worker.id, first_factory_blueprint.id)
-                gc.build(third_worker.id, first_factory_blueprint.id)
-            else:
-                gc.build(first_worker.id, first_factory_blueprint.id)
-                gc.build(second_worker.id, first_factory_blueprint.id)
-                gc.build(third_worker.id, first_factory_blueprint.id)
     except Exception as e:
         print('Error:', e)
         traceback.print_exc()
@@ -248,6 +239,11 @@ while gc.round() <= EARLY_GAME_ROUND_COUNT:
 current_time_left = gc.get_time_left_ms()
 print('ENDING EARLY GAME: {:d}ms elapsed, {:d}ms left'.format(current_time_left - previous_time_left, current_time_left))
 print("*"*50)
+
+#==============================================================================#
+#                               CALL FOR HELP                                  #
+#==============================================================================#
+help_locations = list()
 
 #==============================================================================#
 #                                   MAIN LOOP                                  #
@@ -279,8 +275,12 @@ while True:
                     if unit_states[unit.id].grid is None:
                         unit_states[unit.id].set_grid(grid)
                     if unit_states[unit.id].state == units.Ranger.State.Initial:
-                        random.shuffle(attack_locations)
-                        unit_states[unit.id].set_waypoint(attack_locations[0])
+                        attack_loc = None
+                        bot_loc = unit.location.map_location()
+                        for loc in attack_locations:
+                            if attack_loc is None or bot_loc.distance_squared_to(loc) < bot_loc.distance_squared_to(attack_loc):
+                                attack_loc = loc
+                        unit_states[unit.id].set_waypoint(attack_loc)
 
                 units.run_unit_turn(gc, unit, unit_states[unit.id], (prev_tally, unit_cap))
     except Exception as e:
@@ -291,6 +291,6 @@ while True:
     # Send the actions we've performed, and wait for our next turn.
     gc.next_turn()
     current_time_left = gc.get_time_left_ms()
-    print('ENDING ROUND: {:d}ms elapsed, {:d}ms left'.format(current_time_left - previous_time_left, current_time_left))
+    print('ENDING ROUND: {:d}ms elapsed, {:d}ms left'.format(previous_time_left - current_time_left, current_time_left))
     print("*"*50)
 
