@@ -21,5 +21,5 @@ unit: the unit that will perform the turn. The unit must be of the appropriate u
 state: the current state of the unit
 context: game context passed down by the main run.py method
 """
-def unit_turn(gc, unit, state, context):
+def unit_turn(gc, unit, state):
     return

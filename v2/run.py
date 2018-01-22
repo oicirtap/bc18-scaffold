@@ -255,34 +255,73 @@ while True:
     current_round = gc.round()
     my_units = gc.my_units()
 
+    # Tally
+    tally = Tally()
+    for unit in gc.units():
+        if not unit.location.is_on_map() or not unit.location.is_on_planet(gc.planet()):
+            continue
+        if unit.team == gc.team():
+            tally.add(unit.unit_type)
+        else:
+            # process enemy units we can see
+            pass
+            
     prev_tally = current_tally
     current_tally = Tally()
 
     try:
         if gc.planet() == bc.Planet.Earth:
             # determine if we want to build anything this round.
+            factories_to_build = unit_cap[bc.UnitType.Factory] - tally.tally[bc.UnitType.Factory]
+            workers_to_replicate = unit_cap[bc.UnitType.Worker] - tally.tally[bc.UnitType.Worker]
+            rockets_to_build = unit_cap[bc.UnitType.Rocket] - tally.tally[bc.UnitType.Rocket]
+
             for unit in my_units:
                 # Don't bother with unit not on map or in garrison
                 if not unit.location.is_on_map():
                     continue
 
-                current_tally.add(unit.unit_type)
                 if unit.id not in unit_states:
                     unit_states[unit.id] = units.get_unit_state(unit)
+                state = unit_states[unit.id]
 
                 # Commanding: setting unit state
                 if unit.unit_type == bc.UnitType.Ranger:
-                    if unit_states[unit.id].grid is None:
-                        unit_states[unit.id].set_grid(grid)
-                    if unit_states[unit.id].state == units.Ranger.State.Initial:
+                    if state.grid is None:
+                        state.set_grid(grid)
+                    if state.state == units.Ranger.State.Initial:
                         attack_loc = None
                         bot_loc = unit.location.map_location()
                         for loc in attack_locations:
                             if attack_loc is None or bot_loc.distance_squared_to(loc) < bot_loc.distance_squared_to(attack_loc):
                                 attack_loc = loc
-                        unit_states[unit.id].set_waypoint(attack_loc)
+                        state.set_waypoint(attack_loc)
+                if unit.unit_type == bc.UnitType.Worker:
+                    if workers_to_replicate > 0:
+                        state.replicate = True
+                    if factories_to_build > 0:
+                        state.blueprint_f = True
+                    if rockets_to_build > 0:
+                        state.blueprint_r = True
 
-                units.run_unit_turn(gc, unit, unit_states[unit.id], (prev_tally, unit_cap))
+                units.run_unit_turn(gc, unit, unit_states[unit.id])
+
+                if unit.unit_type == bc.UnitType.Worker:
+                    if state.replicate:
+                        state.replicate = False
+                        if state.replicated:
+                            workers_to_replicate -= 1
+                            state.replicated = False
+                    if state.blueprint_f:
+                        state.blueprint_f = False
+                        if state.blueprinted_f:
+                            factories_to_build -= 1
+                            state.blueprinted_f = False
+                    if state.blueprint_r:
+                        state.blueprint_r = False
+                        if state.blueprinted_r:
+                            rockets_to_build -= 1
+                            state.blueprinted_r = False
     except Exception as e:
         print('Error:', e)
         gc.Error()

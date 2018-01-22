@@ -13,7 +13,7 @@ class UnitState:
     def __init__(self, unit):
         self.state = State.Initial
 
-def unit_turn(gc, unit, state, context):
+def unit_turn(gc, unit, state):
     garrison = unit.structure_garrison()
     if len(garrison) > 0:
         for d in directions:

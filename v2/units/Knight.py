@@ -13,7 +13,7 @@ class UnitState:
     def __init__(self, unit):
         self.state = State.Initial
 
-def unit_turn(gc, unit, state, context):
+def unit_turn(gc, unit, state):
     location = unit.location
     if location.is_on_map():
         nearby = gc.sense_nearby_units(location.map_location(), 2)
